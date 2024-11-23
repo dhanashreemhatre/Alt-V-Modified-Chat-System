@@ -1,70 +1,160 @@
-# Getting Started with Create React App
+# Alt:V Chat System
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+This **Alt:V Chat System** is a custom in-game chat implementation designed for the Alt:V multiplayer platform. It provides a clean, responsive interface for players to communicate in real-time. The system supports core chat features like message rendering, command parsing, and seamless server-client synchronization.
 
-## Available Scripts
+---
 
-In the project directory, you can run:
+## Features
 
-### `npm start`
+### 1. **Real-Time Chat**
+- Players can send and receive messages in real-time.
+- Distinguishes between global, team, and private chat channels.
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+### 2. **Command Parsing**
+- Supports custom chat commands (e.g., `/help`, `/me`, `/whisper`).
+- Extendable command system for server-side interactions.
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+### 3. **Customizable UI**
+- Modern, minimalist design for a seamless in-game experience.
+- Adjustable styles for themes, colors, and fonts.
 
-### `npm test`
+### 4. **Server-Client Synchronization**
+- Server-to-client and client-to-server communication.
+- Ensure messages are relayed and stored correctly.
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+### 5. **Message History**
+- Scrollable chat window to view past messages.
+- Optional persistence for session-based message storage.
 
-### `npm run build`
+### 6. **Notifications and Alerts**
+- Display system notifications or admin messages in a different style.
+- Highlight specific users or messages using tags or mentions.
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+---
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+## File Structure
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+### Client-Side
 
-### `npm run eject`
+- **chat.js**: Handles client-side chat rendering and interactions.
+- **styles.css**: Styling for the chat UI.
+- **commands.js**: Defines client-side commands and their behaviors.
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+### Server-Side
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+- **server.js**: Core logic for chat handling and command processing.
+- **commands.js**: Server-side definitions for command handlers.
+- **events.js**: Custom Alt:V event listeners for message transmission.
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+---
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+## Getting Started
 
-## Learn More
+### Prerequisites
+Ensure you have the following installed:
+- **Alt:V Server** (latest version)
+- A code editor like **VS Code**
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+### Installation
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+1. Clone the repository:
+   ```bash
+   git clone <repository-url>
+   ```
 
-### Code Splitting
+2. Navigate to the project folder:
+   ```bash
+   cd altv-chat-system
+   ```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+3. Copy the files to your Alt:V resource directory:
+   ```bash
+   cp -r ./chat-system /path/to/altv-resources
+   ```
 
-### Analyzing the Bundle Size
+4. Add the resource to your `server.cfg`:
+   ```ini
+   resources: [ ..., "chat-system" ]
+   ```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+---
 
-### Making a Progressive Web App
+## Usage
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+### Commands
+Commands are parsed with a leading `/`. For example:
+- `/help` – Displays available commands.
+- `/me <action>` – Roleplay an action.
+- `/whisper <player> <message>` – Send a private message to a player.
 
-### Advanced Configuration
+### Chat Channels
+- **Global Chat**: Default channel for all players.
+- **Team Chat**: Restricted to specific teams or groups.
+- **Private Messages**: Player-to-player communication.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+### Message Types
+- **Player Messages**: Regular player communications.
+- **Admin Messages**: Highlighted and styled for visibility.
+- **System Notifications**: Alerts or announcements from the server.
 
-### Deployment
+---
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+## Customization
 
-### `npm run build` fails to minify
+### UI Styling
+Modify the `styles.css` file to:
+- Change colors and fonts.
+- Adjust the position and size of the chat window.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+### Command Extensions
+Add new commands in the `commands.js` file:
+```javascript
+alt.on('chatCommand', (command, args) => {
+  if (command === 'greet') {
+    alt.emitServer('chat:sendMessage', `Hello, ${args[0]}!`);
+  }
+});
+```
+
+### Server Logic
+Extend the server-side `commands.js` to define server-specific behaviors:
+```javascript
+alt.on('playerCommand', (player, command, args) => {
+  if (command === 'kick') {
+    let target = getPlayerByName(args[0]);
+    if (target) target.kick('You have been kicked!');
+  }
+});
+```
+
+---
+
+## Technologies Used
+
+- **Alt:V Multiplayer Framework**: Provides the backend and client API.
+- **JavaScript**: Core language for client and server logic.
+- **CSS**: For chat UI styling.
+
+---
+
+## Future Enhancements
+
+- Add **chat filtering** for inappropriate words.
+- Implement **group chat functionality**.
+- Provide **logging and auditing** for chat messages.
+- Support **persistent chat history** stored in a database.
+
+---
+
+## License
+This project is licensed under the [MIT License](LICENSE).
+
+---
+
+## Contributions
+Feel free to fork the repository, create pull requests, or suggest features via issues.
+
+---
+
+### Contact
+For support or further questions, reach out to the repository maintainer.
